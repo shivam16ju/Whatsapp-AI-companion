@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp AI Companion — Dashboard</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #151d2f;
+      --card-border: #232f48;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #25d366;
+      --primary-hover: #20ba5a;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --warning: #f59e0b;
+      --blue: #3b82f6;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
+
+    header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--card-border); margin-bottom: 24px; gap: 16px; }
+    .brand h1 { font-size: 1.5rem; display: flex; align-items: center; gap: 8px; }
+    .brand span { font-size: 0.85rem; color: var(--text-muted); font-weight: normal; }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+
+    /* Kill switch */
+    .kill-switch-btn {
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .kill-switch-off { background-color: #166534; color: #bbf7d0; border: 1px solid #22c55e; }
+    .kill-switch-off:hover { background-color: #15803d; }
+    .kill-switch-on { background-color: var(--danger); color: #fff; box-shadow: 0 0 15px rgba(239, 68, 68, 0.6); }
+    .kill-switch-on:hover { background-color: var(--danger-hover); }
+
+    /* Navigation tabs */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab-btn { background: transparent; border: 1px solid var(--card-border); color: var(--text-muted); padding: 8px 16px; border-radius: var(--radius); cursor: pointer; font-weight: 600; }
+    .tab-btn.active { background: var(--card-bg); color: var(--primary); border-color: var(--primary); }
+
+    /* Layout containers */
+    .view-section { display: none; }
+    .view-section.active { display: grid; gap: 24px; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card { background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 20px; }
+    .card h2 { font-size: 1.15rem; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+
+    /* Forms & Inputs */
+    input, textarea, select {
+      width: 100%; padding: 10px; background: #0b1120; border: 1px solid var(--card-border);
+      border-radius: var(--radius); color: var(--text); margin-bottom: 12px; font-size: 0.9rem;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); }
+    button.btn {
+      background-color: var(--primary); color: #000; font-weight: 600; padding: 10px 16px;
+      border: none; border-radius: var(--radius); cursor: pointer; transition: background 0.2s;
+    }
+    button.btn:hover { background-color: var(--primary-hover); }
+    button.btn-secondary { background-color: #232f48; color: var(--text); }
+    button.btn-secondary:hover { background-color: #334155; }
+    button.btn-danger { background-color: var(--danger); color: white; }
+    button.btn-danger:hover { background-color: var(--danger-hover); }
+    button.btn-sm { padding: 4px 8px; font-size: 0.8rem; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--card-border); }
+    th { color: var(--text-muted); font-weight: 600; }
+    tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+    .badge { padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+    .badge-on { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
+    .badge-off { background: #374151; color: #9ca3af; }
+
+    /* Toggle switch */
+    .switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #374151; transition: .2s; border-radius: 20px; }
+    .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(18px); }
+
+    /* Chat bubble container */
+    .chat-container { display: flex; flex-direction: column; height: 420px; }
+    .chat-history { flex: 1; overflow-y: auto; padding: 12px; background: #0b1120; border-radius: var(--radius); margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .chat-msg { max-width: 75%; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; line-height: 1.4; word-break: break-word; }
+    .chat-in { align-self: flex-start; background-color: #1e293b; color: #e2e8f0; border-bottom-left-radius: 2px; }
+    .chat-out { align-self: flex-end; background-color: #065f46; color: #ecfdf5; border-bottom-right-radius: 2px; }
+    .chat-ts { font-size: 0.7rem; opacity: 0.7; margin-top: 4px; text-align: right; }
+    .chat-status { font-size: 0.68rem; opacity: 0.82; margin-top: 2px; text-align: right; }
+    .chat-error { color: #fecaca; font-size: 0.72rem; margin-top: 4px; text-align: right; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100; }
+    .modal-overlay.active { display: flex; }
+    .modal-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 24px; width: 90%; max-width: 480px; }
+
+    .help-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: -8px; margin-bottom: 12px; }
+    .alert-box { padding: 12px; border-radius: var(--radius); margin-bottom: 12px; font-size: 0.9rem; }
+    .alert-success { background: #064e3b; color: #6ee7b7; }
+    .alert-error { background: #7f1d1d; color: #fca5a5; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>Whatsapp AI Companion <span>("future of messeging ")</span></h1>
+    </div>
+    <div class="header-actions">
+      <a href="/qr" target="_blank" class="btn btn-sm" style="background: #22c55e; color: #000; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+        📱 Link WhatsApp (QR)
+      </a>
+      <button id="killSwitchBtn" class="kill-switch-btn kill-switch-off" onclick="toggleKillSwitch()">
+        🛡️ AUTO-REPLIES ACTIVE
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="promptToken()">🔑 Change Token</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('contactsTab')">👥 Contacts & Chat</button>
+    <button class="tab-btn" onclick="switchTab('liveFeedTab')">🌐 Live Chat Feed</button>
+    <button class="tab-btn" onclick="switchTab('schedulesTab')">⏰ Schedules</button>
+    <button class="tab-btn" onclick="switchTab('uploadTab')">📁 Ingest Chat History</button>
+    <button class="tab-btn" onclick="switchTab('qrTab')">📱 WhatsApp Web QR</button>
+  </div>
+
+  <!-- VIEW 1: CONTACTS & CHAT -->
+  <div id="contactsTab" class="view-section active grid-2">
+    <!-- Contacts list card -->
+    <div class="card">
+      <h2>
+        Contacts & Conversations
+        <button class="btn btn-sm" onclick="openAddContactModal()">+ Add Contact</button>
+      </h2>
+      <input type="text" id="contactSearchInput" placeholder="🔍 Search by name or phone number..." oninput="filterContacts(this.value)" style="margin-bottom: 12px; background: #0b1120;">
+      <div style="overflow-x: auto; max-height: 460px; overflow-y: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Contact / Latest Msg</th>
+              <th>WhatsApp #</th>
+              <th>Bot</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="contactsTbody">
+            <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Loading contacts...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Live Chat & Persona card -->
+    <div class="card chat-container">
+      <h2>
+        <span id="activeContactTitle">Select a Contact</span>
+        <div id="activeContactControls" style="display: none; gap: 6px;">
+          <button class="btn btn-secondary btn-sm" onclick="openPersonaModal()">📝 Persona</button>
+          <button class="btn btn-secondary btn-sm" onclick="openMemoriesModal()">🧠 Memories</button>
+        </div>
+      </h2>
+
+      <div id="chatHistory" class="chat-history">
+        <div style="margin: auto; color: var(--text-muted); font-size: 0.9rem;">
+          Select a contact to view recent chat history.
+        </div>
+      </div>
+
+      <div id="chatInputArea" style="display: flex; gap: 8px;">
+        <input type="text" id="manualMsgInput" placeholder="Type a message to send manually..." onkeydown="if(event.key==='Enter') sendManualMessage()">
+        <button class="btn" style="white-space: nowrap;" onclick="sendManualMessage()">Send</button>
+      </div>
+      <div class="help-hint" style="margin-top: 4px;">
+        ℹ️ Adheres to Meta's 24-hr rule: uses free-form text if within 24h, else hello_world template.
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW: LIVE CHAT FEED (ALL CONTACTS) -->
+  <div id="liveFeedTab" class="view-section">
+    <div class="card" style="width: 100%;">
+      <h2>
+        🌐 Live Chat Feed (All WhatsApp Messages)
+        <span style="font-size: 0.8rem; color: var(--primary); font-weight: normal;">● Auto-updating every 3s</span>
+      </h2>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 140px;">Time</th>
+              <th style="width: 180px;">Contact</th>
+              <th style="width: 90px;">Direction</th>
+              <th>Message Content</th>
+              <th style="width: 140px;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="liveFeedTbody">
+            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading live messages...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 2: SCHEDULES -->
+  <div id="schedulesTab" class="view-section grid-2">
+    <div class="card">
+      <h2>Active Schedules</h2>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Contact</th>
+              <th>Cron</th>
+              <th>Message</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="schedulesTbody">
+            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading schedules...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Add New Schedule</h2>
+      <form onsubmit="handleCreateSchedule(event)">
+        <label style="font-size: 0.85rem; color: var(--text-muted);">Contact:</label>
+        <select id="scheduleContactSelect" required>
+          <option value="">Select contact...</option>
+        </select>
+
+        <label style="font-size: 0.85rem; color: var(--text-muted);">5-Field Cron Expression:</label>
+        <input type="text" id="scheduleCron" placeholder="0 9 * * *" required>
+        <div class="help-hint">
+          Examples: <code>0 9 * * *</code> (daily 9 AM), <code>0 22 * * *</code> (daily 10 PM), <code>0 9 * * 1-5</code> (weekdays 9 AM).
+        </div>
+
+        <label style="font-size: 0.85rem; color: var(--text-muted);">Message Body:</label>
+        <textarea id="scheduleBody" rows="3" placeholder="Good morning! Hope you have a wonderful day." required></textarea>
+
+        <label style="font-size: 0.85rem; color: var(--text-muted);">Fallback Template Name (for >24h outside window):</label>
+        <input type="text" id="scheduleTemplateName" value="hello_world" required>
+
+        <button type="submit" class="btn" style="width: 100%;">Create Schedule</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- VIEW 3: UPLOAD CHAT HISTORY -->
+  <div id="uploadTab" class="view-section">
+    <div class="card" style="max-width: 650px; margin: 0 auto; width: 100%;">
+      <h2>Ingest WhatsApp Chat Export</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+        Upload a <code>.txt</code> export from WhatsApp. The companion chunks your conversation windows, generates embeddings, and indexes them into Pinecone for Hinglish/slang style mimicking.
+      </p>
+
+      <form onsubmit="handleChatUpload(event)">
+        <label style="font-size: 0.85rem; color: var(--text-muted);">Chat Export (.txt):</label>
+        <input type="file" id="chatExportFile" accept=".txt" required>
+
+        <label style="font-size: 0.85rem; color: var(--text-muted);">Your Name in Chat:</label>
+        <input type="text" id="chatSenderName" placeholder="e.g. John Doe" required>
+        <div class="help-hint">Must match your sender name exactly as it appears in the chat text file.</div>
+
+        <button type="submit" id="uploadBtn" class="btn" style="width: 100%;">Parse & Ingest to Pinecone</button>
+      </form>
+
+      <div id="uploadStatusBox" style="margin-top: 16px; display: none;"></div>
+    </div>
+  </div>
+
+  <!-- VIEW 4: WHATSAPP WEB QR CODE -->
+  <div id="qrTab" class="view-section">
+    <div class="card" style="max-width: 480px; margin: 0 auto; width: 100%; text-align: center;">
+      <h2 style="justify-content: center; margin-bottom: 8px;">📱 Link WhatsApp Web</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+        Scan this QR code with WhatsApp on your phone (<strong>Settings &gt; Linked Devices &gt; Link a Device</strong>).
+      </p>
+      <iframe src="/qr" style="width: 100%; height: 500px; border: 1px solid var(--card-border); border-radius: 12px; background: #0f172a;"></iframe>
+    </div>
+  </div>
+
+  <!-- MODALS -->
+  <!-- Add Contact Modal -->
+  <div id="addContactModal" class="modal-overlay">
+    <div class="modal-box">
+      <h2>Add New Contact</h2>
+      <form onsubmit="handleAddContact(event)">
+        <label style="font-size: 0.85rem; color: var(--text-muted);">WhatsApp Number (digits with country code):</label>
+        <input type="text" id="newContactNumber" placeholder="919876543210" required>
+
+        <label style="font-size: 0.85rem; color: var(--text-muted);">Name:</label>
+        <input type="text" id="newContactName" placeholder="Friend Name">
+
+        <label style="font-size: 0.85rem; color: var(--text-muted);">Persona Notes:</label>
+        <textarea id="newContactNotes" rows="2" placeholder="College friend, casually roasts each other..."></textarea>
+
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addContactModal')">Cancel</button>
+          <button type="submit" class="btn">Save Contact</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Persona Modal -->
+  <div id="personaModal" class="modal-overlay">
+    <div class="modal-box">
+      <h2>Edit Persona Notes</h2>
+      <textarea id="editPersonaText" rows="6" placeholder="Describe relationship, tone preferences, inside jokes..."></textarea>
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button class="btn btn-secondary" onclick="closeModal('personaModal')">Cancel</button>
+        <button class="btn" onclick="savePersonaNotes()">Save Notes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Memories Modal -->
+  <div id="memoriesModal" class="modal-overlay">
+    <div class="modal-box">
+      <h2>Contact Memories & Facts</h2>
+      <div id="memoriesList" style="max-height: 250px; overflow-y: auto; margin-bottom: 16px;"></div>
+
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="newFactInput" placeholder="Add fact (e.g. Loves chai, allergic to nuts)..." style="margin-bottom: 0;">
+        <button class="btn btn-sm" onclick="addMemoryFact()">Add</button>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <button class="btn btn-secondary" onclick="closeModal('memoriesModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let activeContactId = null;
+    let activeContactData = null;
+
+    function getToken() {
+      let token = sessionStorage.getItem('dashboard_token');
+      if (!token) {
+        token = prompt("Enter Dashboard Token (default is in .env):", "shiavm@1");
+        if (token) {
+          sessionStorage.setItem('dashboard_token', token.trim());
+        }
+      }
+      return token;
+    }
+
+    function promptToken() {
+      const current = sessionStorage.getItem('dashboard_token') || 'shiavm@1';
+      const token = prompt("Enter Dashboard Token:", current);
+      if (token !== null) {
+        sessionStorage.setItem('dashboard_token', token.trim());
+        loadInitialData();
+      }
+    }
+
+    async function apiFetch(endpoint, options = {}) {
+      const token = getToken();
+      options.headers = {
+        ...(options.headers || {}),
+        'Authorization': `Bearer ${token}`
+      };
+      const res = await fetch(endpoint, options);
+      if (res.status === 401) {
+        sessionStorage.removeItem('dashboard_token');
+        alert("Invalid or missing dashboard token. Please re-enter.");
+        getToken();
+        throw new Error("Unauthorized");
+      }
+      return res;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+
+      if (tabId === 'schedulesTab') loadSchedules();
+      if (tabId === 'liveFeedTab') loadLiveFeed();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    // --- KILL SWITCH ---
+    async function loadKillSwitch() {
+      try {
+        const res = await apiFetch('/api/kill-switch');
+        const data = await res.json();
+        updateKillSwitchUI(data.kill_switch === 'on');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updateKillSwitchUI(isOn) {
+      const btn = document.getElementById('killSwitchBtn');
+      if (isOn) {
+        btn.className = 'kill-switch-btn kill-switch-on';
+        btn.innerHTML = '🛑 KILL SWITCH ON (PAUSED)';
+      } else {
+        btn.className = 'kill-switch-btn kill-switch-off';
+        btn.innerHTML = '🛡️ AUTO-REPLIES ACTIVE';
+      }
+    }
+
+    async function toggleKillSwitch() {
+      const btn = document.getElementById('killSwitchBtn');
+      const isCurrentlyOn = btn.classList.contains('kill-switch-on');
+      const newState = !isCurrentlyOn;
+      try {
+        const res = await apiFetch('/api/kill-switch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ on: newState })
+        });
+        const data = await res.json();
+        updateKillSwitchUI(data.kill_switch === 'on');
+      } catch (e) {
+        alert("Failed to toggle kill switch: " + e.message);
+      }
+    }
+
+    // --- CONTACTS ---
+    async function loadContacts() {
+      try {
+        const res = await apiFetch('/api/contacts');
+        const contacts = await res.json();
+        const tbody = document.getElementById('contactsTbody');
+        const schedSelect = document.getElementById('scheduleContactSelect');
+
+        if (contacts.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No contacts yet. Click + Add Contact.</td></tr>';
+          schedSelect.innerHTML = '<option value="">No contacts available</option>';
+          return;
+        }
+
+        tbody.innerHTML = '';
+        schedSelect.innerHTML = '<option value="">Select contact...</option>';
+
+        contacts.forEach(c => {
+          // Populate schedule dropdown
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = `${c.name} (${c.wa_number})`;
+          schedSelect.appendChild(opt);
+        });
+
+        cachedContacts = contacts;
+        const searchVal = document.getElementById('contactSearchInput')?.value;
+        if (searchVal && searchVal.trim()) {
+          filterContacts(searchVal);
+        } else {
+          renderContactsTable(contacts);
+        }
+
+        // If previously selected contact exists, refresh; otherwise auto-select first contact
+        if (activeContactId) {
+          const match = contacts.find(c => c.id === activeContactId);
+          if (match) activeContactData = match;
+        } else if (contacts.length > 0) {
+          selectContact(contacts[0].id);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    let cachedContacts = [];
+
+    function renderContactsTable(contacts) {
+      const tbody = document.getElementById('contactsTbody');
+      tbody.innerHTML = '';
+      if (contacts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No contacts found matching search.</td></tr>';
+        return;
+      }
+
+      contacts.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+        if (activeContactId === c.id) {
+          tr.style.backgroundColor = 'rgba(37, 211, 102, 0.08)';
+          tr.style.borderLeft = '3px solid var(--primary)';
+        }
+
+        const unsavedBadge = c.is_unsaved
+          ? '<span class="badge" style="background: #334155; color: #fbbf24; font-size: 0.68rem; margin-left: 6px;">Unsaved</span>'
+          : '';
+
+        let lastMsgSnippet = '';
+        if (c.last_message) {
+          const prefix = c.last_message_direction === 'out' ? '<strong>You:</strong> ' : '';
+          lastMsgSnippet = `<div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">${prefix}${escapeHtml(c.last_message)}</div>`;
+        }
+
+        tr.innerHTML = `
+          <td>
+            <div style="font-weight: 600; display: flex; align-items: center;">${escapeHtml(c.name)} ${unsavedBadge}</div>
+            ${lastMsgSnippet}
+          </td>
+          <td style="font-size: 0.85rem; color: #94a3b8;">+${escapeHtml(c.wa_number)}</td>
+          <td>
+            <label class="switch" onclick="event.stopPropagation()">
+              <input type="checkbox" ${c.bot_enabled ? 'checked' : ''} onchange="toggleBot(${c.id}, this.checked)">
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td>
+            <div style="display:flex; gap: 4px;" onclick="event.stopPropagation()">
+              <button class="btn btn-secondary btn-sm" onclick="selectContact(${c.id})">Chat</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteContact(${c.id})">✕</button>
+            </div>
+          </td>
+        `;
+        tr.onclick = () => selectContact(c.id);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterContacts(query) {
+      if (!query || !query.trim()) {
+        renderContactsTable(cachedContacts);
+        return;
+      }
+      const q = query.toLowerCase().trim();
+      const filtered = cachedContacts.filter(c =>
+        (c.name && c.name.toLowerCase().includes(q)) ||
+        (c.wa_number && c.wa_number.includes(q)) ||
+        (c.last_message && c.last_message.toLowerCase().includes(q))
+      );
+      renderContactsTable(filtered);
+    }
+
+    async function toggleBot(contactId, enabled) {
+      try {
+        await apiFetch(`/api/contacts/${contactId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_enabled: enabled })
+        });
+        loadContacts();
+      } catch (e) {
+        alert("Failed to toggle bot: " + e.message);
+      }
+    }
+
+    function openAddContactModal() {
+      document.getElementById('addContactModal').classList.add('active');
+    }
+
+    async function handleAddContact(e) {
+      e.preventDefault();
+      const num = document.getElementById('newContactNumber').value.trim();
+      const name = document.getElementById('newContactName').value.trim();
+      const notes = document.getElementById('newContactNotes').value.trim();
+
+      try {
+        const res = await apiFetch('/api/contacts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ wa_number: num, name, persona_notes: notes, bot_enabled: true })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "Error adding contact");
+        }
+        closeModal('addContactModal');
+        document.getElementById('newContactNumber').value = '';
+        document.getElementById('newContactName').value = '';
+        document.getElementById('newContactNotes').value = '';
+        loadContacts();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function deleteContact(id) {
+      if (!confirm("Are you sure you want to delete this contact and all associated chat logs?")) return;
+      try {
+        await apiFetch(`/api/contacts/${id}`, { method: 'DELETE' });
+        if (activeContactId === id) {
+          activeContactId = null;
+          document.getElementById('activeContactTitle').textContent = 'Select a Contact';
+          document.getElementById('activeContactControls').style.display = 'none';
+          document.getElementById('chatHistory').innerHTML = '<div style="margin: auto; color: var(--text-muted);">Select a contact.</div>';
+        }
+        loadContacts();
+      } catch (e) {
+        alert("Error deleting contact: " + e.message);
+      }
+    }
+
+    // --- CHAT & MESSAGES ---
+    async function selectContact(id) {
+      activeContactId = id;
+      try {
+        const res = await apiFetch('/api/contacts');
+        const contacts = await res.json();
+        activeContactData = contacts.find(c => c.id === id);
+
+        document.getElementById('activeContactTitle').textContent = `${activeContactData.name} (${activeContactData.wa_number})`;
+        document.getElementById('activeContactControls').style.display = 'flex';
+        loadMessages(id);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function loadMessages(id) {
+      const historyDiv = document.getElementById('chatHistory');
+      try {
+        const res = await apiFetch(`/api/contacts/${id}/messages`);
+        const messages = await res.json();
+
+        if (messages.length === 0) {
+          historyDiv.innerHTML = '<div style="margin: auto; color: var(--text-muted); font-size: 0.9rem;">No messages exchanged yet. Send one below!</div>';
+          return;
+        }
+
+        historyDiv.innerHTML = '';
+        messages.forEach(m => {
+          const d = document.createElement('div');
+          d.className = `chat-msg ${m.direction === 'in' ? 'chat-in' : 'chat-out'}`;
+          const timeStr = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+          const statusLabels = {
+            accepted: 'Accepted by Meta · waiting for delivery status',
+            sent: 'Sent by WhatsApp',
+            delivered: 'Delivered ✓',
+            read: 'Read ✓✓',
+            failed: 'Not delivered'
+          };
+          const deliveryStatus = m.direction === 'out' && m.wa_status
+            ? `<div class="chat-status">${escapeHtml(statusLabels[m.wa_status] || m.wa_status)}</div>`
+            : '';
+          const deliveryError = m.direction === 'out' && m.wa_error
+            ? `<div class="chat-error">${escapeHtml(m.wa_error)}</div>`
+            : '';
+          d.innerHTML = `<div>${escapeHtml(m.body)}</div><div class="chat-ts">${timeStr}</div>${deliveryStatus}${deliveryError}`;
+          historyDiv.appendChild(d);
+        });
+        historyDiv.scrollTop = historyDiv.scrollHeight;
+      } catch (e) {
+        historyDiv.innerHTML = '<div style="margin: auto; color: var(--danger);">Failed to load messages.</div>';
+      }
+    }
+
+    async function sendManualMessage() {
+      if (!activeContactId) {
+        alert("Please select a contact first.");
+        return;
+      }
+      const input = document.getElementById('manualMsgInput');
+      const body = input.value.trim();
+      if (!body) return;
+
+      input.value = '';
+      try {
+        const res = await apiFetch('/api/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contact_id: activeContactId, body })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "Failed to send");
+        }
+        loadMessages(activeContactId);
+      } catch (e) {
+        alert("Send error: " + e.message);
+      }
+    }
+
+    // --- PERSONA & MEMORIES ---
+    function openPersonaModal() {
+      if (!activeContactData) return;
+      document.getElementById('editPersonaText').value = activeContactData.persona_notes || '';
+      document.getElementById('personaModal').classList.add('active');
+    }
+
+    async function savePersonaNotes() {
+      const notes = document.getElementById('editPersonaText').value.trim();
+      try {
+        await apiFetch(`/api/contacts/${activeContactId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ persona_notes: notes })
+        });
+        if (activeContactData) activeContactData.persona_notes = notes;
+        closeModal('personaModal');
+        await loadContacts();
+        alert("✅ Persona notes updated! The bot will now talk strictly according to these instructions.");
+      } catch (e) {
+        alert("Error saving notes: " + e.message);
+      }
+    }
+
+    async function openMemoriesModal() {
+      if (!activeContactId) return;
+      loadMemories();
+      document.getElementById('memoriesModal').classList.add('active');
+    }
+
+    async function loadMemories() {
+      const list = document.getElementById('memoriesList');
+      list.innerHTML = 'Loading memories...';
+      try {
+        const res = await apiFetch(`/api/contacts/${activeContactId}/memories`);
+        const memories = await res.json();
+        if (memories.length === 0) {
+          list.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No facts recorded yet. Add one below.</div>';
+          return;
+        }
+        list.innerHTML = '';
+        memories.forEach(m => {
+          const row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.justifyContent = 'space-between';
+          row.style.alignItems = 'center';
+          row.style.padding = '6px 0';
+          row.style.borderBottom = '1px solid var(--card-border)';
+          row.innerHTML = `
+            <span style="font-size: 0.9rem;">• ${escapeHtml(m.fact)}</span>
+            <button class="btn btn-danger btn-sm" onclick="deleteMemory(${m.id})">✕</button>
+          `;
+          list.appendChild(row);
+        });
+      } catch (e) {
+        list.innerHTML = 'Failed to load memories.';
+      }
+    }
+
+    async function addMemoryFact() {
+      const input = document.getElementById('newFactInput');
+      const fact = input.value.trim();
+      if (!fact) return;
+
+      try {
+        await apiFetch(`/api/contacts/${activeContactId}/memories`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fact })
+        });
+        input.value = '';
+        loadMemories();
+      } catch (e) {
+        alert("Error adding fact: " + e.message);
+      }
+    }
+
+    async function deleteMemory(memId) {
+      try {
+        await apiFetch(`/api/contacts/${activeContactId}/memories/${memId}`, { method: 'DELETE' });
+        loadMemories();
+      } catch (e) {
+        alert("Error deleting fact: " + e.message);
+      }
+    }
+
+    // --- SCHEDULES ---
+    async function loadSchedules() {
+      const tbody = document.getElementById('schedulesTbody');
+      try {
+        const res = await apiFetch('/api/schedules');
+        const schedules = await res.json();
+
+        if (schedules.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No schedules configured yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = '';
+        schedules.forEach(s => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${escapeHtml(s.contact_name)}</strong><br><small style="color: var(--text-muted)">${s.contact_number}</small></td>
+            <td><code>${escapeHtml(s.cron)}</code></td>
+            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(s.body)}</td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" ${s.enabled ? 'checked' : ''} onchange="toggleSchedule(${s.id}, this.checked)">
+                <span class="slider"></span>
+              </label>
+            </td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="deleteSchedule(${s.id})">✕ Delete</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--danger);">Failed to load schedules.</td></tr>';
+      }
+    }
+
+    async function handleCreateSchedule(e) {
+      e.preventDefault();
+      const contact_id = parseInt(document.getElementById('scheduleContactSelect').value);
+      const cron = document.getElementById('scheduleCron').value.trim();
+      const body = document.getElementById('scheduleBody').value.trim();
+      const template_name = document.getElementById('scheduleTemplateName').value.trim() || 'hello_world';
+
+      try {
+        const res = await apiFetch('/api/schedules', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contact_id, cron, body, template_name, enabled: true })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "Error creating schedule");
+        }
+        document.getElementById('scheduleCron').value = '';
+        document.getElementById('scheduleBody').value = '';
+        loadSchedules();
+        alert("Schedule registered successfully!");
+      } catch (err) {
+        alert("Schedule error: " + err.message);
+      }
+    }
+
+    async function toggleSchedule(id, enabled) {
+      try {
+        await apiFetch(`/api/schedules/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled })
+        });
+      } catch (e) {
+        alert("Error toggling schedule: " + e.message);
+      }
+    }
+
+    async function deleteSchedule(id) {
+      if (!confirm("Delete this schedule?")) return;
+      try {
+        await apiFetch(`/api/schedules/${id}`, { method: 'DELETE' });
+        loadSchedules();
+      } catch (e) {
+        alert("Error deleting schedule: " + e.message);
+      }
+    }
+
+    // --- UPLOAD CHAT EXPORT ---
+    async function handleChatUpload(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('chatExportFile');
+      const senderName = document.getElementById('chatSenderName').value.trim();
+      const statusBox = document.getElementById('uploadStatusBox');
+      const uploadBtn = document.getElementById('uploadBtn');
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Please select a file.");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('sender_name', senderName);
+
+      statusBox.style.display = 'block';
+      statusBox.className = 'alert-box';
+      statusBox.style.background = '#1e293b';
+      statusBox.style.color = '#93c5fd';
+      statusBox.textContent = '⏳ Parsing export, embedding chunks, and upserting into Pinecone... This may take a moment.';
+      uploadBtn.disabled = true;
+
+      try {
+        const token = getToken();
+        const res = await fetch('/api/chat-history', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "Upload error");
+        }
+
+        const data = await res.json();
+        statusBox.className = 'alert-box alert-success';
+        statusBox.textContent = `✅ Successfully parsed ${data.messages_parsed} messages and upserted ${data.chunks_upserted} style chunks for '${data.sender_name}'!`;
+        fileInput.value = '';
+      } catch (err) {
+        statusBox.className = 'alert-box alert-error';
+        statusBox.textContent = `❌ Upload failed: ${err.message}`;
+      } finally {
+        uploadBtn.disabled = false;
+      }
+    }
+
+    async function loadLiveFeed() {
+      const tbody = document.getElementById('liveFeedTbody');
+      if (!tbody) return;
+      try {
+        const res = await apiFetch('/api/messages?limit=60');
+        const messages = await res.json();
+        if (messages.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No messages in database yet.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = '';
+        messages.forEach(m => {
+          const tr = document.createElement('tr');
+          const timeStr = m.created_at ? new Date(m.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '';
+          const dirBadge = m.direction === 'in'
+            ? '<span class="badge" style="background: #1e293b; color: #93c5fd; border: 1px solid #3b82f6;">IN (Contact)</span>'
+            : '<span class="badge" style="background: #064e3b; color: #6ee7b7; border: 1px solid #10b981;">OUT (Bot)</span>';
+
+          let statusHtml = '';
+          if (m.direction === 'out') {
+            if (m.wa_status === 'delivered') {
+              statusHtml = '<span style="color: #22c55e; font-weight: 600;">Delivered ✓</span>';
+            } else if (m.wa_status === 'failed') {
+              statusHtml = `<span style="color: #ef4444; font-weight: 600;" title="${escapeHtml(m.wa_error || '')}">Failed ✕</span>`;
+            } else {
+              statusHtml = `<span style="color: #f59e0b;">${escapeHtml(m.wa_status || 'Sent')}</span>`;
+            }
+          } else {
+            statusHtml = '<span style="color: var(--text-muted);">Received</span>';
+          }
+
+          tr.innerHTML = `
+            <td style="font-size: 0.8rem; color: var(--text-muted);">${timeStr}</td>
+            <td><strong>${escapeHtml(m.contact_name)}</strong><br><small style="color: var(--text-muted);">${escapeHtml(m.contact_number)}</small></td>
+            <td>${dirBadge}</td>
+            <td style="word-break: break-word; font-size: 0.95rem;">${escapeHtml(m.body)}</td>
+            <td style="font-size: 0.8rem;">${statusHtml}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error('Failed to load live feed:', e);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function loadInitialData() {
+      loadKillSwitch();
+      loadContacts();
+    }
+
+    window.onload = loadInitialData;
+
+    // Real-time polling
+    window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        const liveFeedActive = document.getElementById('liveFeedTab')?.classList.contains('active');
+        if (liveFeedActive) {
+          loadLiveFeed();
+        } else if (activeContactId) {
+          loadMessages(activeContactId);
+        }
+      }
+    }, 2500);
+
+    // Refresh contacts every 3s in background so new contacts pop up
+    window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        loadContacts();
+      }
+    }, 3000);
+  </script>
+</body>
+</html>

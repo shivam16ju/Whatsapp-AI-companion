@@ -1,0 +1,64 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Virtual Environment & Python
+.venv/
+venv/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Databases & SQLite
+wa.db
+wa.db-journal
+wa.db-wal
+wa.db-shm
+wa_jobs.db
+*.sqlite3
+*.db
+
+# Node & Baileys Bridge
+bridge/node_modules/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# WhatsApp Bridge Session & Credentials (CRITICAL)
+bridge/bridge_auth/
+bridge_auth/
+creds.json
+
+# Binaries & Downloads
+bin/
+ngrok
+
+# Logs & Generated Media
+logs/
+*.log
+media/generated/
+media/*.png
+media/*.jpg
+media/*.jpeg
+media/*.webp
+
+# OS & Editor files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
