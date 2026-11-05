@@ -122,9 +122,9 @@ async def get_apple_touch_icon():
     return FileResponse(DASHBOARD_DIR / "apple-touch-icon.png", media_type="image/png")
 
 
-@app.get("/WhatsApp_Companion.apk")
-@app.get("/download/whatsapp-companion.apk")
-@app.get("/app.apk")
+@app.api_route("/WhatsApp_Companion.apk", methods=["GET", "HEAD"])
+@app.api_route("/download/whatsapp-companion.apk", methods=["GET", "HEAD"])
+@app.api_route("/app.apk", methods=["GET", "HEAD"])
 async def download_apk():
     """Serve standalone Android APK for phone installation."""
     apk_file = DASHBOARD_DIR / "WhatsApp_Companion.apk"
