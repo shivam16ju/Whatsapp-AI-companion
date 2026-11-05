@@ -65,7 +65,8 @@ MEDIA_DIR = Path(__file__).resolve().parent.parent / "media"
 MEDIA_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/media", StaticFiles(directory=str(MEDIA_DIR)), name="media")
 
-DASHBOARD_FILE = Path(__file__).resolve().parent.parent / "dashboard" / "index.html"
+DASHBOARD_DIR = Path(__file__).resolve().parent.parent / "dashboard"
+DASHBOARD_FILE = DASHBOARD_DIR / "index.html"
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -74,6 +75,51 @@ async def serve_dashboard():
     if DASHBOARD_FILE.exists():
         return FileResponse(DASHBOARD_FILE)
     return HTMLResponse("<h2>Dashboard index.html not found. Please create dashboard/index.html</h2>", status_code=404)
+
+
+@app.get("/manifest.webmanifest")
+@app.get("/manifest.json")
+async def get_manifest():
+    """Serve Web App Manifest for mobile PWA installation."""
+    manifest_file = DASHBOARD_DIR / "manifest.webmanifest"
+    if manifest_file.exists():
+        return FileResponse(manifest_file, media_type="application/manifest+json")
+    return HTMLResponse("{}", media_type="application/json")
+
+
+@app.get("/sw.js")
+async def get_service_worker():
+    """Serve Service Worker with root scope permissions."""
+    sw_file = DASHBOARD_DIR / "sw.js"
+    if sw_file.exists():
+        return FileResponse(sw_file, media_type="application/javascript", headers={"Service-Worker-Allowed": "/"})
+    return HTMLResponse("// no sw", media_type="application/javascript")
+
+
+@app.get("/app-icon.svg")
+async def get_icon_svg():
+    return FileResponse(DASHBOARD_DIR / "app-icon.svg", media_type="image/svg+xml")
+
+
+@app.get("/favicon.svg")
+@app.get("/favicon.ico")
+async def get_favicon():
+    return FileResponse(DASHBOARD_DIR / "favicon.svg", media_type="image/svg+xml")
+
+
+@app.get("/app-icon-192.png")
+async def get_icon_192():
+    return FileResponse(DASHBOARD_DIR / "app-icon-192.png", media_type="image/png")
+
+
+@app.get("/app-icon-512.png")
+async def get_icon_512():
+    return FileResponse(DASHBOARD_DIR / "app-icon-512.png", media_type="image/png")
+
+
+@app.get("/apple-touch-icon.png")
+async def get_apple_touch_icon():
+    return FileResponse(DASHBOARD_DIR / "apple-touch-icon.png", media_type="image/png")
 
 
 @app.get("/qr", response_class=HTMLResponse)

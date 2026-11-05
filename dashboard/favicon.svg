@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="50%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="bubbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="sparkleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="50%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#ffffff" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background squircle -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bgGrad)" stroke="#10b981" stroke-width="6" stroke-opacity="0.4" />
+
+  <!-- Ambient light -->
+  <circle cx="256" cy="230" r="140" fill="#10b981" opacity="0.25" filter="url(#glow)" />
+
+  <!-- WhatsApp Chat Bubble Base -->
+  <path d="M 256 110 C 173 110 106 177 106 260 C 106 288 114 315 129 337 L 115 395 L 176 381 C 200 397 227 406 256 406 C 339 406 406 339 406 260 C 406 177 339 110 256 110 Z" 
+        fill="url(#bubbleGrad)" filter="url(#glow)" />
+
+  <!-- Inner Dark Glass Bubble -->
+  <path d="M 256 126 C 182 126 122 186 122 260 C 122 285 129 309 143 329 L 132 376 L 181 365 C 203 379 229 387 256 387 C 330 387 390 327 390 260 C 390 186 330 126 256 126 Z" 
+        fill="#091322" opacity="0.9" />
+
+  <!-- AI Sparkle Core (4-point star) -->
+  <path d="M 256 180 Q 256 250 186 250 Q 256 250 256 320 Q 256 250 326 250 Q 256 250 256 180 Z" 
+        fill="url(#sparkleGrad)" filter="url(#glow)" />
+
+  <!-- Neural Connection Nodes -->
+  <circle cx="210" cy="204" r="10" fill="#38bdf8" />
+  <circle cx="302" cy="204" r="10" fill="#10b981" />
+  <circle cx="210" cy="296" r="10" fill="#10b981" />
+  <circle cx="302" cy="296" r="10" fill="#f59e0b" />
+  
+  <line x1="210" y1="204" x2="256" y2="250" stroke="#38bdf8" stroke-width="3" opacity="0.6" />
+  <line x1="302" y1="204" x2="256" y2="250" stroke="#10b981" stroke-width="3" opacity="0.6" />
+  <line x1="210" y1="296" x2="256" y2="250" stroke="#10b981" stroke-width="3" opacity="0.6" />
+  <line x1="302" y1="296" x2="256" y2="250" stroke="#f59e0b" stroke-width="3" opacity="0.6" />
+
+  <!-- Small secondary sparkle -->
+  <path d="M 330 180 Q 330 205 305 205 Q 330 205 330 230 Q 330 205 355 205 Q 330 205 330 180 Z" 
+        fill="#ffffff" opacity="0.9" />
+</svg>

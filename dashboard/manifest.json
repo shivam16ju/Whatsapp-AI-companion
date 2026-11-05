@@ -1,0 +1,55 @@
+{
+  "id": "/?source=pwa",
+  "name": "WhatsApp AI Companion",
+  "short_name": "Companion",
+  "description": "Personal AI WhatsApp Companion — Real-time auto-replies, memory & smart personas.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#090d16",
+  "theme_color": "#10b981",
+  "categories": ["social", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live Chats",
+      "short_name": "Chats",
+      "description": "Open active WhatsApp chats",
+      "url": "/#contactsTab",
+      "icons": [{ "src": "/app-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Link WhatsApp",
+      "short_name": "Link QR",
+      "description": "Scan WhatsApp Web QR code",
+      "url": "/#qrTab",
+      "icons": [{ "src": "/app-icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
