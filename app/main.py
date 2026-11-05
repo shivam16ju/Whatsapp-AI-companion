@@ -122,6 +122,22 @@ async def get_apple_touch_icon():
     return FileResponse(DASHBOARD_DIR / "apple-touch-icon.png", media_type="image/png")
 
 
+@app.get("/WhatsApp_Companion.apk")
+@app.get("/download/whatsapp-companion.apk")
+@app.get("/app.apk")
+async def download_apk():
+    """Serve standalone Android APK for phone installation."""
+    apk_file = DASHBOARD_DIR / "WhatsApp_Companion.apk"
+    if apk_file.exists():
+        return FileResponse(
+            apk_file,
+            media_type="application/vnd.android.package-archive",
+            filename="WhatsApp_Companion.apk",
+            headers={"Content-Disposition": 'attachment; filename="WhatsApp_Companion.apk"'}
+        )
+    return HTMLResponse("<h2>APK building in background. Please refresh in a moment.</h2>", status_code=404)
+
+
 @app.get("/qr", response_class=HTMLResponse)
 async def proxy_bridge_qr():
     """Proxy WhatsApp Web QR linking page from bridge for public and local access."""

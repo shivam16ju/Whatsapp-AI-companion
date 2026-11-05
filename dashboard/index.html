@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>WhatsApp AI Companion</title>
   
-  <!-- PWA Meta & Web Manifest -->
+  <!-- PWA & Mobile Web App Meta -->
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="/app-icon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <meta name="theme-color" content="#10b981">
+  <meta name="theme-color" content="#080c14">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,34 +17,36 @@
   <meta name="application-name" content="WhatsApp AI Companion">
   <meta name="description" content="Personal AI WhatsApp Companion — Real-time auto-replies, memory & smart personas.">
 
-  <!-- Google Font: Inter -->
+  <!-- Inter Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       DESIGN SYSTEM TOKENS (ui-ux-pro-max & design-system)
+       PRO DESIGN SYSTEM (ui-ux-pro-max & design-system)
        ========================================================================== */
     :root {
-      --bg-base: #090d16;
-      --bg-surface: #101827;
-      --bg-surface-elevated: #162238;
+      --bg-base: #080c14;
+      --bg-surface: #0f172a;
+      --bg-surface-elevated: #162033;
+      --bg-surface-hover: #1e2b45;
       --bg-input: #0b1120;
       
-      --border-subtle: #1e293b;
-      --border-highlight: #2c3e5d;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(255, 255, 255, 0.15);
       
       --primary: #10b981;
       --primary-hover: #059669;
-      --primary-glow: rgba(16, 185, 129, 0.25);
+      --primary-glow: rgba(16, 185, 129, 0.28);
       
       --accent-indigo: #6366f1;
       --accent-sky: #38bdf8;
+      --accent-amber: #f59e0b;
       
       --danger: #ef4444;
       --danger-hover: #dc2626;
-      --danger-glow: rgba(239, 68, 68, 0.3);
+      --danger-glow: rgba(239, 68, 68, 0.35);
       
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
@@ -55,15 +57,12 @@
       --radius-lg: 20px;
       --radius-full: 9999px;
       
-      --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-      --shadow-glow: 0 0 20px -2px var(--primary-glow);
-      
-      --bottom-nav-height: 68px;
+      --shadow-card: 0 12px 30px -8px rgba(0, 0, 0, 0.6);
+      --bottom-nav-height: 64px;
       --safe-bottom: env(safe-area-inset-bottom, 16px);
       --safe-top: env(safe-area-inset-top, 0px);
     }
 
-    /* Reset & Base Setup */
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -75,7 +74,6 @@
       font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     }
 
-    /* Full App Shell Container */
     #app-root {
       display: flex;
       flex-direction: column;
@@ -86,16 +84,16 @@
     }
 
     /* ==========================================================================
-       HEADER & NAVIGATION (DESKTOP + MOBILE)
+       PRO HEADER BAR
        ========================================================================== */
     header.app-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 18px;
-      background: rgba(16, 24, 39, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border-subtle);
       z-index: 40;
       flex-shrink: 0;
@@ -114,7 +112,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+      background: linear-gradient(135deg, #064e3b 0%, #10b981 100%);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+      flex-shrink: 0;
     }
 
     .brand-title {
@@ -140,10 +140,16 @@
       border-radius: 50%;
       display: inline-block;
       background: var(--danger);
+      transition: background 0.3s;
     }
     .status-dot.online {
       background: var(--primary);
       box-shadow: 0 0 8px var(--primary);
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.2); }
     }
 
     .header-actions {
@@ -152,12 +158,12 @@
       gap: 8px;
     }
 
-    /* PWA Install Button Header Pill */
-    .btn-install-pwa {
-      display: none;
+    /* Pro Download APK Button */
+    .btn-download-apk {
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 7px 12px;
+      padding: 7px 13px;
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: #000;
       border: none;
@@ -165,10 +171,11 @@
       font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.45);
       transition: all 0.2s;
+      text-decoration: none;
     }
-    .btn-install-pwa:active { transform: scale(0.96); }
+    .btn-download-apk:active { transform: scale(0.96); }
 
     /* Kill switch Pill */
     .kill-switch-btn {
@@ -191,7 +198,7 @@
     }
     .kill-switch-off:hover { background: rgba(16, 185, 129, 0.22); }
     .kill-switch-on {
-      background: rgba(239, 68, 68, 0.18);
+      background: rgba(239, 68, 68, 0.2);
       color: #fca5a5;
       border-color: var(--danger);
       box-shadow: 0 0 12px var(--danger-glow);
@@ -219,7 +226,7 @@
     .nav-tabs {
       display: flex;
       gap: 6px;
-      padding: 8px 18px;
+      padding: 8px 16px;
       background: var(--bg-base);
       border-bottom: 1px solid var(--border-subtle);
       overflow-x: auto;
@@ -252,7 +259,7 @@
       border-color: rgba(16, 185, 129, 0.3);
     }
 
-    /* Mobile Bottom Navigation Dock (Visible on mobile screens) */
+    /* Mobile Bottom Navigation Dock */
     .mobile-bottom-nav {
       display: none;
       position: fixed;
@@ -261,9 +268,9 @@
       right: 0;
       height: calc(var(--bottom-nav-height) + var(--safe-bottom));
       padding-bottom: var(--safe-bottom);
-      background: rgba(16, 24, 39, 0.92);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       border-top: 1px solid var(--border-subtle);
       z-index: 50;
       justify-content: space-around;
@@ -287,18 +294,9 @@
       transition: all 0.2s;
       min-width: 58px;
     }
-    .dock-btn svg {
-      width: 22px;
-      height: 22px;
-      transition: transform 0.2s;
-    }
-    .dock-btn.active {
-      color: var(--primary);
-    }
-    .dock-btn.active svg {
-      transform: translateY(-2px);
-      stroke: var(--primary);
-    }
+    .dock-btn svg { width: 22px; height: 22px; transition: transform 0.2s; }
+    .dock-btn.active { color: var(--primary); }
+    .dock-btn.active svg { transform: translateY(-2px); stroke: var(--primary); }
 
     /* ==========================================================================
        MAIN CONTENT VIEWS
@@ -317,12 +315,10 @@
       overflow-y: auto;
       padding: 16px;
     }
-    .view-panel.active {
-      display: flex;
-    }
+    .view-panel.active { display: flex; }
 
     /* ==========================================================================
-       CONTACTS & CHAT SPLIT-VIEW (DESKTOP & NATIVE MOBILE)
+       CONTACTS & CHAT SPLIT-VIEW
        ========================================================================== */
     .chat-layout {
       display: grid;
@@ -333,7 +329,7 @@
       padding: 0;
     }
 
-    /* Contacts Column */
+    /* Contacts Sidebar */
     .contacts-sidebar {
       display: flex;
       flex-direction: column;
@@ -378,7 +374,7 @@
     }
     .search-input {
       width: 100%;
-      padding: 9px 12px 9px 36px;
+      padding: 9px 36px 9px 36px;
       background: var(--bg-input);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
@@ -387,8 +383,16 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    .search-input:focus {
-      border-color: var(--primary);
+    .search-input:focus { border-color: var(--primary); }
+    .btn-clear-search {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 1rem;
+      display: none;
     }
 
     /* Filter Chips */
@@ -419,7 +423,6 @@
       color: #6ee7b7;
     }
 
-    /* Contacts List */
     .contacts-list-container {
       flex: 1;
       overflow-y: auto;
@@ -434,9 +437,7 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.03);
       transition: background 0.15s ease;
     }
-    .contact-item:hover {
-      background: rgba(255, 255, 255, 0.03);
-    }
+    .contact-item:hover { background: rgba(255, 255, 255, 0.03); }
     .contact-item.selected {
       background: rgba(16, 185, 129, 0.08);
       border-left: 3px solid var(--primary);
@@ -460,11 +461,7 @@
       box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--primary);
     }
 
-    .contact-meta {
-      flex: 1;
-      min-width: 0;
-    }
-
+    .contact-meta { flex: 1; min-width: 0; }
     .contact-name-row {
       display: flex;
       justify-content: space-between;
@@ -478,10 +475,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .contact-time {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-    }
+    .contact-time { font-size: 0.7rem; color: var(--text-dim); }
 
     .contact-snippet-row {
       display: flex;
@@ -518,7 +512,7 @@
     input:checked + .slider-compact:before { transform: translateX(14px); }
 
     /* ==========================================================================
-       CONVERSATION / CHAT WINDOW
+       PRO CHAT WINDOW
        ========================================================================== */
     .chat-view {
       display: flex;
@@ -534,7 +528,7 @@
     .chat-header {
       padding: 10px 16px;
       border-bottom: 1px solid var(--border-subtle);
-      background: rgba(16, 24, 39, 0.9);
+      background: rgba(15, 23, 42, 0.92);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -545,6 +539,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      min-width: 0;
     }
 
     .btn-chat-back {
@@ -558,12 +553,13 @@
     }
     .btn-chat-back svg { width: 22px; height: 22px; }
 
+    .chat-header-info { min-width: 0; }
     .chat-header-info h3 {
       font-size: 0.95rem;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .chat-header-info p {
       font-size: 0.72rem;
@@ -601,12 +597,12 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.02) 0%, transparent 80%), #090d16;
+      background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 80%), #090d16;
     }
 
     .chat-bubble {
       max-width: 82%;
-      padding: 9px 13px;
+      padding: 10px 14px;
       border-radius: 16px;
       font-size: 0.92rem;
       line-height: 1.45;
@@ -637,11 +633,13 @@
     .bubble-media-img {
       max-width: 100%;
       border-radius: var(--radius-sm);
-      margin-top: 6px;
+      margin-top: 8px;
       display: block;
       cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: transform 0.2s;
     }
+    .bubble-media-img:hover { transform: scale(1.02); }
 
     .bubble-footer {
       display: flex;
@@ -658,18 +656,41 @@
     }
     .bubble-checks svg { width: 14px; height: 14px; }
 
+    /* Chat Quick Suggestion Chips */
+    .quick-chips {
+      display: flex;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .quick-chips::-webkit-scrollbar { display: none; }
+    .quick-chip-btn {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      border-radius: var(--radius-full);
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .quick-chip-btn:hover { color: var(--text-main); border-color: var(--border-highlight); }
+
     /* Chat Input Bar */
     .chat-input-bar {
       padding: 10px 14px;
       background: var(--bg-surface);
-      border-top: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
       gap: 8px;
     }
     .chat-msg-input {
       flex: 1;
-      padding: 10px 14px;
+      padding: 10px 16px;
       background: var(--bg-input);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-full);
@@ -680,8 +701,8 @@
     .chat-msg-input:focus { border-color: var(--primary); }
 
     .btn-send {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       background: var(--primary);
       color: #000;
@@ -698,7 +719,7 @@
     .btn-send svg { width: 18px; height: 18px; stroke: #000; }
 
     /* ==========================================================================
-       CARDS, TABLES, FORMS FOR OTHER TABS
+       MODALS, CARDS, FORMS & TOASTS
        ========================================================================== */
     .card-panel {
       background: var(--bg-surface);
@@ -742,11 +763,9 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
-    table.data-table tr:hover {
-      background: rgba(255, 255, 255, 0.02);
-    }
+    table.data-table tr:hover { background: rgba(255, 255, 255, 0.02); }
 
-    /* Modal Sheet Styling */
+    /* Modals */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -788,12 +807,11 @@
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1.4rem;
+      line-height: 1;
     }
 
-    .form-group {
-      margin-bottom: 14px;
-    }
+    .form-group { margin-bottom: 14px; }
     .form-group label {
       display: block;
       font-size: 0.8rem;
@@ -826,25 +844,40 @@
     }
     .btn-cta:hover { background: var(--primary-hover); }
 
-    /* PWA Install Drawer Modal */
-    .pwa-instruction-box {
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin: 14px 0;
-      text-align: left;
+    /* Toast Notification Banner */
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 150;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
     }
-    .pwa-instruction-box ol {
-      margin-left: 20px;
-      margin-top: 8px;
-      font-size: 0.88rem;
-      color: #cbd5e1;
-      line-height: 1.6;
+    .toast-msg {
+      background: rgba(16, 24, 39, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--primary);
+      color: #f8fafc;
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: toastIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* ==========================================================================
-       RESPONSIVE MOBILE ADJUSTMENTS (< 768px)
+       MOBILE RESPONSIVENESS (< 768px)
        ========================================================================== */
     @media (max-width: 768px) {
       .nav-tabs { display: none; }
@@ -872,33 +905,24 @@
         border: none;
         border-radius: 0;
       }
-      .chat-view.mobile-open {
-        transform: translateX(0);
-      }
-
-      .btn-chat-back {
-        display: inline-flex;
-      }
-
-      .view-panel {
-        padding: 10px;
-      }
-
-      .card-panel {
-        padding: 14px;
-        border-radius: var(--radius-sm);
-      }
+      .chat-view.mobile-open { transform: translateX(0); }
+      .btn-chat-back { display: inline-flex; }
+      .view-panel { padding: 10px; }
+      .card-panel { padding: 14px; border-radius: var(--radius-sm); }
     }
   </style>
 </head>
 <body>
+
+  <!-- Floating Toast Container -->
+  <div id="toast-container"></div>
 
   <div id="app-root">
     
     <!-- Top Global App Header -->
     <header class="app-header">
       <div class="brand-group">
-        <div class="brand-logo" style="background: linear-gradient(135deg, #064e3b, #10b981);">
+        <div class="brand-logo">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
           </svg>
@@ -913,14 +937,14 @@
       </div>
 
       <div class="header-actions">
-        <!-- Install PWA Button (Shows when browser supports install or on mobile) -->
-        <button id="pwaInstallHeaderBtn" class="btn-install-pwa" onclick="triggerPwaInstall()">
+        <!-- Prominent Download APK Button -->
+        <button class="btn-download-apk" onclick="openApkModal()" title="Download Android APK">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
-          <span>Install App</span>
+          <span>Get .APK</span>
         </button>
 
         <!-- Kill Switch -->
@@ -932,7 +956,7 @@
         </button>
 
         <!-- Auth Token / Settings -->
-        <button class="btn-icon" onclick="promptToken()" title="Set Dashboard API Token">
+        <button class="btn-icon" onclick="openLoginModal()" title="Access Token Settings">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -991,11 +1015,11 @@
     <!-- Main View Panels -->
     <main class="app-main">
 
-      <!-- TAB 1: CONTACTS & INTERACTIVE CHAT -->
+      <!-- TAB 1: CONTACTS & CHAT SPLIT -->
       <section id="contactsTab" class="view-panel active" style="padding: 0;">
         <div class="chat-layout">
           
-          <!-- Left Column: Contacts List -->
+          <!-- Contacts Sidebar -->
           <div class="contacts-sidebar">
             <div class="sidebar-header">
               <div class="sidebar-title-row">
@@ -1009,16 +1033,17 @@
                 </button>
               </div>
 
-              <!-- Instant Search -->
+              <!-- Search -->
               <div class="search-box">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
                 <input type="text" id="contactSearchInput" class="search-input" placeholder="Search chats by name or number..." oninput="handleSearch(this.value)">
+                <button id="btnClearSearch" class="btn-clear-search" onclick="clearSearch()">&times;</button>
               </div>
 
-              <!-- Quick Filter Chips -->
+              <!-- Filter Chips -->
               <div class="filter-chips">
                 <button class="chip active" data-filter="all" onclick="setContactFilter('all')">All</button>
                 <button class="chip" data-filter="bot" onclick="setContactFilter('bot')">Bot Active</button>
@@ -1027,7 +1052,7 @@
               </div>
             </div>
 
-            <!-- Scrollable Contacts List -->
+            <!-- Contacts List -->
             <div id="contactsList" class="contacts-list-container">
               <div style="padding: 30px; text-align: center; color: var(--text-muted); font-size: 0.88rem;">
                 Loading conversations...
@@ -1035,12 +1060,11 @@
             </div>
           </div>
 
-          <!-- Right Column: Interactive Chat Window (Slides in full-screen on mobile) -->
+          <!-- Chat Window (Slide-over on mobile) -->
           <div id="chatViewPanel" class="chat-view">
-            <!-- Chat Header -->
+            <!-- Header -->
             <div class="chat-header">
               <div class="chat-header-user">
-                <!-- Mobile Back Button -->
                 <button class="btn-chat-back" onclick="closeMobileChat()">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -1056,7 +1080,6 @@
               </div>
 
               <div id="chatHeaderControls" class="chat-header-actions" style="display: none;">
-                <!-- Persona Button -->
                 <button class="btn-pill" onclick="openPersonaModal()" title="Edit Persona & Tone Notes">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 20h9"></path>
@@ -1065,7 +1088,6 @@
                   <span>Persona</span>
                 </button>
 
-                <!-- Memories Button -->
                 <button class="btn-pill" onclick="openMemoriesModal()" title="View Contact Memories">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path>
@@ -1073,7 +1095,6 @@
                   <span>Facts</span>
                 </button>
 
-                <!-- In-Chat Bot Toggle Switch -->
                 <label class="switch-compact" title="Auto-reply toggle for this contact">
                   <input type="checkbox" id="chatBotToggle" onchange="toggleActiveContactBot(this.checked)">
                   <span class="slider-compact"></span>
@@ -1081,18 +1102,26 @@
               </div>
             </div>
 
-            <!-- Message Area -->
+            <!-- Messages Area -->
             <div id="chatScrollArea" class="chat-scroll-area">
               <div style="margin: auto; text-align: center; color: var(--text-dim); max-width: 280px;">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px; opacity: 0.5;">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
-                <p style="font-size: 0.9rem; font-weight: 500;">No contact selected</p>
-                <p style="font-size: 0.78rem; margin-top: 4px;">Choose a contact from the list to start reading and replying.</p>
+                <p style="font-size: 0.9rem; font-weight: 500;">No conversation selected</p>
+                <p style="font-size: 0.78rem; margin-top: 4px;">Select a chat from the left or add a new number.</p>
               </div>
             </div>
 
-            <!-- Bottom Chat Input Bar -->
+            <!-- Quick Preset Chips -->
+            <div id="quickChipsBar" class="quick-chips" style="display: none;">
+              <button class="quick-chip-btn" onclick="sendQuickPreset('Photo send karo')">📸 Request Photo</button>
+              <button class="quick-chip-btn" onclick="sendQuickPreset('Kya kar rahe ho?')">👋 Kya kar rahe ho?</button>
+              <button class="quick-chip-btn" onclick="sendQuickPreset('Kaha ho?')">📍 Kaha ho?</button>
+              <button class="quick-chip-btn" onclick="sendQuickPreset('Sab badhiya bhai!')">✨ Sab badhiya!</button>
+            </div>
+
+            <!-- Input Bar -->
             <div id="chatInputBar" class="chat-input-bar">
               <input type="text" id="chatInputText" class="chat-msg-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendManualMessage()">
               <button class="btn-send" onclick="sendManualMessage()" title="Send Message">
@@ -1107,7 +1136,7 @@
         </div>
       </section>
 
-      <!-- TAB 2: LIVE FEED (ALL CONVERSATIONS) -->
+      <!-- TAB 2: LIVE FEED -->
       <section id="liveFeedTab" class="view-panel">
         <div class="card-panel">
           <div class="card-panel-header">
@@ -1139,7 +1168,7 @@
         </div>
       </section>
 
-      <!-- TAB 3: WHATSAPP WEB QR LINKING -->
+      <!-- TAB 3: WHATSAPP WEB QR -->
       <section id="qrTab" class="view-panel">
         <div class="card-panel" style="max-width: 520px; text-align: center;">
           <div class="card-panel-header" style="justify-content: center; margin-bottom: 8px;">
@@ -1161,11 +1190,9 @@
         </div>
       </section>
 
-      <!-- TAB 4: AUTOMATIONS & CRON -->
+      <!-- TAB 4: AUTOMATIONS -->
       <section id="schedulesTab" class="view-panel">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; width: 100%; max-width: 1000px; margin: 0 auto;">
-          
-          <!-- Active Schedules List -->
           <div class="card-panel" style="margin: 0;">
             <div class="card-panel-header">
               <h2>
@@ -1194,7 +1221,6 @@
             </div>
           </div>
 
-          <!-- Add Schedule Form -->
           <div class="card-panel" style="margin: 0;">
             <div class="card-panel-header">
               <h2><span>Add Scheduled Trigger</span></h2>
@@ -1223,11 +1249,10 @@
               <button type="submit" class="btn-cta" style="width: 100%;">Save Automated Schedule</button>
             </form>
           </div>
-
         </div>
       </section>
 
-      <!-- TAB 5: STYLE & CHAT INGEST -->
+      <!-- TAB 5: BRAIN & STYLE -->
       <section id="uploadTab" class="view-panel">
         <div class="card-panel" style="max-width: 620px;">
           <div class="card-panel-header">
@@ -1241,7 +1266,7 @@
             </h2>
           </div>
           <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px; line-height: 1.5;">
-            Upload an exported WhatsApp <code>_chat.txt</code> file. The companion chunks your real conversation style, generates embeddings, and indexes them into Pinecone to mimic your exact slang and typing style!
+            Upload an exported WhatsApp <code>_chat.txt</code> file. The companion chunks your real conversation style and indexes them into Pinecone to mimic your exact slang and typing style!
           </p>
 
           <form onsubmit="handleChatUpload(event)">
@@ -1316,6 +1341,67 @@
        MODALS & DIALOGS
        ========================================================================== -->
   
+  <!-- In-App Glassmorphic Token Modal (Replaces browser prompt!) -->
+  <div id="loginModal" class="modal-overlay">
+    <div class="modal-box" style="text-align: center;">
+      <div class="brand-logo" style="margin: 0 auto 12px; width: 48px; height: 48px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+        </svg>
+      </div>
+      <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">Companion Access</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+        Enter your secure access token to connect this device.
+      </p>
+
+      <form onsubmit="handleTokenSubmit(event)">
+        <div class="form-group" style="text-align: left;">
+          <label>Access Token:</label>
+          <input type="text" id="tokenInputField" class="form-control" value="shiavm@1" placeholder="Enter token..." required style="font-family: monospace; font-size: 1rem; text-align: center;">
+        </div>
+        <button type="submit" class="btn-cta" style="width: 100%; padding: 12px; font-size: 0.95rem;">
+          Connect to Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- APK Download Modal -->
+  <div id="apkModal" class="modal-overlay">
+    <div class="modal-box" style="text-align: center;">
+      <div class="modal-header" style="justify-content: center; position: relative;">
+        <h3 style="display: flex; align-items: center; gap: 8px;">
+          <img src="/app-icon.svg" width="28" height="28" alt="App Icon">
+          <span>Get Mobile App</span>
+        </h3>
+        <button class="btn-close-modal" style="position: absolute; right: 0;" onclick="closeModal('apkModal')">&times;</button>
+      </div>
+
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin: 6px 0 16px;">
+        Run WhatsApp Companion directly on your phone as a native app!
+      </p>
+
+      <!-- Direct APK Download Button -->
+      <a href="/WhatsApp_Companion.apk" download class="btn-cta" style="display: block; padding: 14px; text-decoration: none; margin-bottom: 12px; font-size: 1rem;">
+        📥 Download Android .APK (2.7 MB)
+      </a>
+
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px; text-align: left; font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+        <strong style="color: var(--text-main); display: block; margin-bottom: 4px;">Android Install Guide:</strong>
+        1. Tap the download button above.<br>
+        2. When prompted, tap <strong>Download anyway</strong>.<br>
+        3. Tap the downloaded file & select <strong>Install</strong>.
+      </div>
+
+      <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle); text-align: left;">
+        <strong style="font-size: 0.82rem; color: var(--accent-sky);">For iPhone (iOS) Users:</strong>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+          Tap Safari's <strong>Share</strong> button &rarr; tap <strong>Add to Home Screen</strong> &rarr; instant app!
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Contact Modal -->
   <div id="addContactModal" class="modal-overlay">
     <div class="modal-box">
@@ -1325,7 +1411,7 @@
       </div>
       <form onsubmit="handleAddContact(event)">
         <div class="form-group">
-          <label>WhatsApp Number (Digits with Country Code):</label>
+          <label>WhatsApp Number (With Country Code):</label>
           <input type="text" id="newContactNumber" class="form-control" placeholder="919876543210" required>
         </div>
         <div class="form-group">
@@ -1334,7 +1420,7 @@
         </div>
         <div class="form-group">
           <label>Custom Persona Notes:</label>
-          <textarea id="newContactNotes" rows="3" class="form-control" placeholder="College friend, playfully teases each other, replies with Hindi slang..."></textarea>
+          <textarea id="newContactNotes" rows="3" class="form-control" placeholder="College friend, casually roasts each other, replies with Hindi slang..."></textarea>
         </div>
         <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px;">
           <button type="button" class="btn-pill" onclick="closeModal('addContactModal')">Cancel</button>
@@ -1352,9 +1438,9 @@
         <button class="btn-close-modal" onclick="closeModal('personaModal')">&times;</button>
       </div>
       <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
-        Specify how the bot should talk to this specific contact (e.g. girlfriend, close bro, polite elder, teacher).
+        Specify how the bot talks to this person (e.g. Girlfriend, Bro, Polite Elder, Business Client).
       </p>
-      <textarea id="editPersonaText" rows="6" class="form-control" placeholder="Instructions for AI tone, nicknames, topics..."></textarea>
+      <textarea id="editPersonaText" rows="6" class="form-control" placeholder="Describe relationship, tone preferences, inside jokes..."></textarea>
       <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px;">
         <button type="button" class="btn-pill" onclick="closeModal('personaModal')">Cancel</button>
         <button type="button" class="btn-cta" onclick="savePersonaNotes()">Save Persona</button>
@@ -1377,119 +1463,72 @@
     </div>
   </div>
 
-  <!-- PWA Install Modal / Instructions for Mobile -->
-  <div id="pwaModal" class="modal-overlay">
-    <div class="modal-box" style="text-align: center;">
-      <div class="modal-header" style="justify-content: center; position: relative;">
-        <h3 style="display: flex; align-items: center; gap: 8px;">
-          <img src="/app-icon.svg" width="28" height="28" alt="App Icon">
-          <span>Install Companion App</span>
-        </h3>
-        <button class="btn-close-modal" style="position: absolute; right: 0;" onclick="closeModal('pwaModal')">&times;</button>
-      </div>
-      <p style="font-size: 0.88rem; color: var(--text-muted); margin: 8px 0 14px;">
-        Run this app on your phone just like a native app with zero browser bars!
-      </p>
-
-      <div id="pwaAndroidSection" style="display: none;">
-        <button class="btn-cta" style="width: 100%; font-size: 1rem; padding: 12px;" onclick="executePwaPrompt()">
-          📲 Tap to Install on Device
-        </button>
-      </div>
-
-      <div id="pwaIosSection" class="pwa-instruction-box">
-        <strong>How to install on iPhone / iPad (Safari):</strong>
-        <ol>
-          <li>Tap the <strong>Share</strong> button (box with arrow <span style="font-size: 1.1rem;">⎋</span>) at the bottom.</li>
-          <li>Scroll down and tap <strong>Add to Home Screen</strong> (<span style="font-size: 1rem;">⊞</span>).</li>
-          <li>Tap <strong>Add</strong> at top right!</li>
-        </ol>
-      </div>
-
-      <button class="btn-pill" style="margin-top: 14px;" onclick="closeModal('pwaModal')">Got it!</button>
-    </div>
-  </div>
-
   <!-- ==========================================================================
-       CLIENT APPLICATION LOGIC
-       ========================================================================== */
+       PRO JAVASCRIPT APPLICATION LOGIC
+       ========================================================================== -->
   <script>
     // State
     let activeContactId = null;
     let activeContactData = null;
     let cachedContacts = [];
     let currentFilter = 'all';
-    let deferredPwaPrompt = null;
 
-    // --- SERVICE WORKER & PWA REGISTRATION ---
+    // Toast feedback helper
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast-msg';
+      toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    // --- PWA SERVICE WORKER ---
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
-          .then((reg) => console.log('[PWA] Service Worker registered:', reg.scope))
-          .catch((err) => console.warn('[PWA] Service Worker registration failed:', err));
+          .then((reg) => console.log('[PWA] Service Worker registered'))
+          .catch((err) => console.warn('[PWA] Service Worker warning:', err));
       });
     }
 
-    // Capture beforeinstallprompt for Android/Chrome
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPwaPrompt = e;
-      const installBtn = document.getElementById('pwaInstallHeaderBtn');
-      if (installBtn) installBtn.style.display = 'inline-flex';
-      const pwaAndroid = document.getElementById('pwaAndroidSection');
-      if (pwaAndroid) pwaAndroid.style.display = 'block';
-    });
-
-    function triggerPwaInstall() {
-      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-      if (deferredPwaPrompt) {
-        deferredPwaPrompt.prompt();
-        deferredPwaPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            document.getElementById('pwaInstallHeaderBtn').style.display = 'none';
-          }
-          deferredPwaPrompt = null;
-        });
-      } else {
-        document.getElementById('pwaModal').classList.add('active');
-        if (isIos) {
-          document.getElementById('pwaIosSection').style.display = 'block';
-          document.getElementById('pwaAndroidSection').style.display = 'none';
-        } else {
-          document.getElementById('pwaIosSection').style.display = 'none';
-          document.getElementById('pwaAndroidSection').style.display = 'block';
-        }
-      }
-    }
-
-    function executePwaPrompt() {
-      if (deferredPwaPrompt) {
-        deferredPwaPrompt.prompt();
-        closeModal('pwaModal');
-      } else {
-        alert("To install, tap your browser's menu (⋮ or Share) and select 'Install App' or 'Add to Home screen'.");
-      }
-    }
-
-    // --- AUTHENTICATION & API WRAPPER ---
+    // --- SEAMLESS TOKEN AUTHENTICATION (NO BROWSER PROMPTS) ---
     function getToken() {
-      let token = sessionStorage.getItem('dashboard_token');
-      if (!token) {
-        token = prompt("Enter Dashboard Token (configured in .env):", "shiavm@1");
-        if (token) {
-          sessionStorage.setItem('dashboard_token', token.trim());
-        }
+      // 1. Check URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlToken = urlParams.get('token');
+      if (urlToken) {
+        localStorage.setItem('dashboard_token', urlToken.trim());
+        return urlToken.trim();
       }
-      return token;
+
+      // 2. Check localStorage
+      const saved = localStorage.getItem('dashboard_token');
+      if (saved && saved.trim()) {
+        return saved.trim();
+      }
+
+      // 3. Default fallback token
+      localStorage.setItem('dashboard_token', 'shiavm@1');
+      return 'shiavm@1';
     }
 
-    function promptToken() {
-      const current = sessionStorage.getItem('dashboard_token') || 'shiavm@1';
-      const token = prompt("Enter Dashboard Token:", current);
-      if (token !== null) {
-        sessionStorage.setItem('dashboard_token', token.trim());
+    function openLoginModal() {
+      document.getElementById('tokenInputField').value = getToken();
+      document.getElementById('loginModal').classList.add('active');
+    }
+
+    function handleTokenSubmit(e) {
+      e.preventDefault();
+      const val = document.getElementById('tokenInputField').value.trim();
+      if (val) {
+        localStorage.setItem('dashboard_token', val);
+        closeModal('loginModal');
+        showToast('🔑 Token saved!');
         loadInitialData();
       }
     }
@@ -1502,9 +1541,7 @@
       };
       const res = await fetch(endpoint, options);
       if (res.status === 401) {
-        sessionStorage.removeItem('dashboard_token');
-        alert("Invalid or missing dashboard token. Please re-enter.");
-        getToken();
+        openLoginModal();
         throw new Error("Unauthorized");
       }
       return res;
@@ -1512,19 +1549,16 @@
 
     // --- NAVIGATION TABS ---
     function switchTab(tabId) {
-      // Update desktop buttons
       document.querySelectorAll('.nav-tab-btn').forEach(b => {
         b.classList.remove('active');
         if (b.getAttribute('onclick')?.includes(tabId)) b.classList.add('active');
       });
 
-      // Update mobile dock buttons
       document.querySelectorAll('.dock-btn').forEach(b => {
         b.classList.remove('active');
         if (b.getAttribute('onclick')?.includes(tabId)) b.classList.add('active');
       });
 
-      // Show view panel
       document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
       const activePanel = document.getElementById(tabId);
       if (activePanel) activePanel.classList.add('active');
@@ -1534,7 +1568,12 @@
     }
 
     function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    }
+
+    function openApkModal() {
+      document.getElementById('apkModal').classList.add('active');
     }
 
     // --- STATUS & KILL SWITCH ---
@@ -1556,8 +1595,8 @@
       } catch (e) {
         const dot = document.getElementById('bridgeStatusDot');
         const text = document.getElementById('bridgeStatusText');
-        dot.className = 'status-dot';
-        text.textContent = 'Bridge Offline';
+        if (dot) dot.className = 'status-dot';
+        if (text) text.textContent = 'Bridge Offline';
       }
     }
 
@@ -1595,8 +1634,9 @@
         });
         const data = await res.json();
         updateKillSwitchUI(data.kill_switch === 'on');
+        showToast(newState ? '🛑 Kill Switch Activated (Auto-replies paused)' : '🛡️ Bot Active (Auto-replies running)');
       } catch (e) {
-        alert("Failed to toggle kill switch: " + e.message);
+        showToast('Error: ' + e.message);
       }
     }
 
@@ -1607,7 +1647,6 @@
         const contacts = await res.json();
         cachedContacts = contacts;
 
-        // Populate schedule contact select dropdown
         const schedSelect = document.getElementById('scheduleContactSelect');
         if (schedSelect) {
           const currentVal = schedSelect.value;
@@ -1623,7 +1662,6 @@
 
         renderFilteredContacts();
 
-        // Refresh active contact if selected
         if (activeContactId) {
           const match = contacts.find(c => c.id === activeContactId);
           if (match) {
@@ -1646,7 +1684,17 @@
     }
 
     function handleSearch(query) {
+      const btnClear = document.getElementById('btnClearSearch');
+      if (btnClear) btnClear.style.display = query.trim() ? 'block' : 'none';
       renderFilteredContacts();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('contactSearchInput');
+      if (input) {
+        input.value = '';
+        handleSearch('');
+      }
     }
 
     function renderFilteredContacts() {
@@ -1733,9 +1781,10 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bot_enabled: enabled })
         });
+        showToast(enabled ? '🤖 Bot auto-reply enabled' : '⏸️ Bot auto-reply disabled');
         loadContacts();
       } catch (e) {
-        alert("Failed to toggle bot: " + e.message);
+        showToast("Error: " + e.message);
       }
     }
 
@@ -1749,9 +1798,11 @@
       activeContactId = id;
       activeContactData = cachedContacts.find(c => c.id === id);
 
-      // Open on mobile by sliding in
       const chatPanel = document.getElementById('chatViewPanel');
       if (chatPanel) chatPanel.classList.add('mobile-open');
+
+      const quickChips = document.getElementById('quickChipsBar');
+      if (quickChips) quickChips.style.display = 'flex';
 
       if (activeContactData) {
         updateChatHeader(activeContactData);
@@ -1793,7 +1844,7 @@
           return;
         }
 
-        const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.clientHeight <= scrollArea.scrollTop + 50;
+        const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.clientHeight <= scrollArea.scrollTop + 60;
         scrollArea.innerHTML = '';
 
         messages.forEach(m => {
@@ -1803,7 +1854,6 @@
 
           const timeStr = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
 
-          // Check if message mentions generated media or images
           let mediaHtml = '';
           const bodyText = m.body || '';
           const imgMatch = bodyText.match(/\/media\/generated\/[a-zA-Z0-9_\-\.]+\.(png|jpg|jpeg|webp)/i);
@@ -1811,7 +1861,6 @@
             mediaHtml = `<img src="${imgMatch[0]}" class="bubble-media-img" alt="Generated Photo" onclick="window.open(this.src, '_blank')">`;
           }
 
-          // Double check status icon
           let checkIcon = '';
           if (isOut) {
             checkIcon = `
@@ -1834,8 +1883,9 @@
           scrollArea.appendChild(bubble);
         });
 
-        // Keep scroll at bottom
-        scrollArea.scrollTop = scrollArea.scrollHeight;
+        if (isScrolledToBottom) {
+          scrollArea.scrollTop = scrollArea.scrollHeight;
+        }
       } catch (e) {
         console.error('Failed to load messages:', e);
       }
@@ -1843,7 +1893,7 @@
 
     async function sendManualMessage() {
       if (!activeContactId) {
-        alert("Please select a contact first.");
+        showToast("Please select a contact first.");
         return;
       }
       const input = document.getElementById('chatInputText');
@@ -1861,9 +1911,18 @@
           const err = await res.json();
           throw new Error(err.detail || "Failed to send");
         }
+        showToast('Message sent!');
         loadMessages(activeContactId);
       } catch (e) {
-        alert("Send error: " + e.message);
+        showToast("Send error: " + e.message);
+      }
+    }
+
+    function sendQuickPreset(text) {
+      const input = document.getElementById('chatInputText');
+      if (input) {
+        input.value = text;
+        sendManualMessage();
       }
     }
 
@@ -1885,9 +1944,9 @@
         if (activeContactData) activeContactData.persona_notes = notes;
         closeModal('personaModal');
         await loadContacts();
-        alert("✅ Persona notes updated! The bot will now reply strictly with these instructions.");
+        showToast("✅ Persona notes saved!");
       } catch (e) {
-        alert("Error saving notes: " + e.message);
+        showToast("Error saving notes: " + e.message);
       }
     }
 
@@ -1935,8 +1994,9 @@
         });
         input.value = '';
         loadMemories();
+        showToast("Memory fact added!");
       } catch (e) {
-        alert("Error adding fact: " + e.message);
+        showToast("Error adding fact: " + e.message);
       }
     }
 
@@ -1944,8 +2004,9 @@
       try {
         await apiFetch(`/api/contacts/${activeContactId}/memories/${memId}`, { method: 'DELETE' });
         loadMemories();
+        showToast("Fact deleted.");
       } catch (e) {
-        alert("Error deleting fact: " + e.message);
+        showToast("Error deleting fact: " + e.message);
       }
     }
 
@@ -1974,9 +2035,10 @@
         document.getElementById('newContactNumber').value = '';
         document.getElementById('newContactName').value = '';
         document.getElementById('newContactNotes').value = '';
+        showToast("Contact added!");
         await loadContacts();
       } catch (err) {
-        alert(err.message);
+        showToast(err.message);
       }
     }
 
@@ -2067,9 +2129,9 @@
         document.getElementById('scheduleCron').value = '';
         document.getElementById('scheduleBody').value = '';
         loadSchedules();
-        alert("Automated schedule successfully registered!");
+        showToast("Automated schedule registered!");
       } catch (err) {
-        alert("Schedule error: " + err.message);
+        showToast("Schedule error: " + err.message);
       }
     }
 
@@ -2080,8 +2142,9 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ enabled })
         });
+        showToast(enabled ? "Schedule enabled" : "Schedule paused");
       } catch (e) {
-        alert("Error toggling schedule: " + e.message);
+        showToast("Error: " + e.message);
       }
     }
 
@@ -2090,8 +2153,9 @@
       try {
         await apiFetch(`/api/schedules/${id}`, { method: 'DELETE' });
         loadSchedules();
+        showToast("Schedule deleted.");
       } catch (e) {
-        alert("Error deleting schedule: " + e.message);
+        showToast("Error: " + e.message);
       }
     }
 
@@ -2104,7 +2168,7 @@
       const uploadBtn = document.getElementById('uploadBtn');
 
       if (!fileInput.files || fileInput.files.length === 0) {
-        alert("Please select a .txt file.");
+        showToast("Please select a .txt file.");
         return;
       }
 
@@ -2135,6 +2199,7 @@
         statusBox.style.color = '#6ee7b7';
         statusBox.textContent = `✅ Successfully indexed ${data.messages_parsed} messages and ${data.chunks_upserted} style chunks!`;
         fileInput.value = '';
+        showToast("Chat style ingested!");
       } catch (err) {
         statusBox.style.background = 'rgba(239, 68, 68, 0.15)';
         statusBox.style.color = '#fca5a5';
@@ -2144,7 +2209,7 @@
       }
     }
 
-    // Helper
+    // Escape HTML Helper
     function escapeHtml(str) {
       if (!str) return '';
       return String(str)
@@ -2155,7 +2220,7 @@
         .replace(/'/g, "&#039;");
     }
 
-    // --- INITIALIZATION & POLLING TIMERS ---
+    // --- INITIALIZATION & POLLING ---
     function loadInitialData() {
       checkBridgeStatus();
       loadKillSwitch();
@@ -2164,19 +2229,17 @@
 
     window.onload = loadInitialData;
 
-    // Bridge Status Check every 5s
+    // Polling Intervals
     setInterval(() => {
       if (document.visibilityState === 'visible') checkBridgeStatus();
     }, 5000);
 
-    // Active Message Polling every 2.5s
     setInterval(() => {
       if (document.visibilityState === 'visible' && activeContactId) {
         loadMessages(activeContactId);
       }
     }, 2500);
 
-    // Contacts Polling every 4s
     setInterval(() => {
       if (document.visibilityState === 'visible') {
         loadContacts();
